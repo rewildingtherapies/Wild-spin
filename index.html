@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wild Spin Kids</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Kids edition. Layout: forest header band, then wheel (left) and challenge card (right); stacks to one column on narrow screens. Single light theme for projector clarity. */
+:root{
+  --forest:#1a3a2a; --forest-2:#2a5540; --ember:#b85420; --ember-dk:#94400f;
+  --cream:#f3ecda; --paper:#fbf8ef; --bark:#5a4630; --ink:#14221a; --muted:#4b5a4f; --line:#cfc3a3;
+  --display:'Fredoka', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --body:'Atkinson Hyperlegible', Verdana, 'Segoe UI', system-ui, sans-serif;
+  color-scheme: light;
+}
+html,body{background:var(--cream);color:var(--ink)}
+body{font-family:var(--body);font-size:clamp(19px,0.9vw + 11px,28px);line-height:1.45;min-height:100%}
+*{box-sizing:border-box}
+body{margin:0}
+[hidden]{display:none!important}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:4px solid var(--ember);outline-offset:3px;border-radius:10px}
+
+/* Header */
+.top{background:var(--forest);color:var(--paper);position:relative;z-index:2}
+.top-inner{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding-block:14px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}
+.brand svg{width:44px;height:44px;flex:none}
+.brand h1{font-family:var(--display);font-weight:800;font-size:1.5em;line-height:1.05;margin:0;text-wrap:balance}
+.brand h1 small{display:block;font-family:var(--body);font-weight:700;font-size:.5em;letter-spacing:.14em;text-transform:uppercase;color:#e9b48f}
+.modes{display:flex;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);border-radius:16px;padding:4px;gap:4px;flex-wrap:wrap}
+.modes button{background:transparent;border:0;color:var(--paper);font-weight:700;padding:.45em .9em;border-radius:12px;min-height:56px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--paper);color:var(--forest)}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tool{display:inline-flex;align-items:center;gap:8px;background:transparent;border:2px solid rgba(255,255,255,.35);color:var(--paper);
+  border-radius:12px;padding:.35em .75em;min-height:56px;font-size:.78em;font-weight:700;cursor:pointer}
+.tool svg{width:22px;height:22px;flex:none}
+.tool[aria-pressed="true"]{background:rgba(255,255,255,.14);border-color:var(--paper)}
+.tool.warn{background:var(--ember);border-color:var(--ember)}
+
+/* Stage */
+.stage{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:clamp(18px,3vw,48px);align-items:start;
+  padding-block:clamp(16px,2.5vw,36px) 150px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1800px;margin:0 auto}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.left{display:flex;flex-direction:column;align-items:center;gap:18px;min-width:0}
+.wheel-wrap{width:min(100%,62vh,640px);min-width:260px;aspect-ratio:1;max-width:100%}
+.wheel-wrap svg{width:100%;height:100%;display:block;touch-action:manipulation}
+.seg-label{font-family:var(--display);font-weight:700;font-size:11px;fill:#fff;text-anchor:middle}
+#hub{cursor:pointer}
+#hub:focus-visible{outline:none}
+#hub:focus-visible circle{stroke:var(--ember)}
+.spin-btn{width:min(100%,62vh,640px);min-height:92px;font-family:var(--display);font-weight:800;font-size:1.7em;letter-spacing:.06em;
+  background:var(--ember);color:#fff;border:0;border-radius:20px;cursor:pointer;box-shadow:0 6px 0 var(--ember-dk)}
+.spin-btn:active{transform:translateY(3px);box-shadow:0 3px 0 var(--ember-dk)}
+.spin-btn:disabled{opacity:.6;cursor:wait}
+
+/* Panel under wheel */
+.panel{width:min(100%,62vh,640px);background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.panel h2{font-family:var(--display);font-size:1.05em;margin:0;color:var(--forest)}
+.panel p{margin:0}
+.progress{font-size:.8em;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:12px;background:#e6dcc3;border-radius:6px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--forest-2)}
+.leaves{display:flex;flex-wrap:wrap;gap:4px;min-height:30px}
+.leaves svg{width:28px;height:28px}
+.big-num{font-family:var(--display);font-weight:800;font-size:2.2em;line-height:1;color:var(--forest);font-variant-numeric:tabular-nums}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.teams{grid-template-columns:1fr}}
+.team{border:3px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.team.on{border-color:var(--ember);background:#fdf1e8}
+.team input{width:100%;border:2px solid var(--line);border-radius:10px;padding:.2em .4em;background:#fff;font-weight:700;min-height:48px}
+.team .score{font-family:var(--display);font-weight:800;font-size:2em;text-align:center;font-variant-numeric:tabular-nums;color:var(--forest)}
+.team .row{display:flex;gap:8px}
+.team .row button{flex:1;min-height:56px;border-radius:12px;border:2px solid var(--forest);background:#fff;font-weight:700;font-size:1.1em;cursor:pointer}
+.team .row button.plus{background:var(--forest);color:#fff}
+.turn-tag{font-size:.75em;font-weight:700;color:var(--ember-dk);min-height:1.2em}
+.link-btn{align-self:flex-start;background:none;border:2px solid var(--forest);border-radius:12px;padding:.3em .8em;min-height:52px;font-weight:700;cursor:pointer;color:var(--forest)}
+
+/* Card */
+.card{background:var(--paper);border:3px solid var(--forest);border-radius:22px;padding:clamp(20px,2.4vw,40px);display:flex;flex-direction:column;gap:20px;min-width:0;
+  box-shadow:0 10px 0 rgba(26,58,42,.12)}
+.card.fade{animation:fade .35s ease-out}
+@keyframes fade{from{opacity:.25}to{opacity:1}}
+.card-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.chip{display:inline-block;background:var(--chip,var(--forest));color:#fff;font-weight:700;padding:.3em .8em;border-radius:999px;font-size:.85em;letter-spacing:.03em}
+.who{font-weight:700;color:var(--ember-dk);font-size:.9em}
+.card h2{font-family:var(--display);font-weight:800;font-size:clamp(30px,2.6vw,54px);line-height:1.15;margin:0;color:var(--forest);text-wrap:balance}
+.card .lead{font-size:clamp(26px,2.1vw,44px);line-height:1.3;margin:0;font-weight:700;text-wrap:pretty}
+.steps{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:8px;font-size:1.05em}
+.note{background:#eef2e6;border-left:6px solid var(--forest-2);padding:12px 16px;border-radius:0 12px 12px 0;font-size:.92em}
+.note b{color:var(--forest)}
+.safety{font-size:.8em;color:var(--muted)}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0;padding:0;list-style:none}
+@media (max-width:600px){.options{grid-template-columns:1fr}}
+.options li{border:3px solid var(--line);border-radius:14px;padding:12px 16px;font-size:1.1em;font-weight:700;background:#fff;display:flex;gap:12px;align-items:baseline}
+.options li .k{font-family:var(--display);color:var(--ember-dk)}
+.options li.right{border-color:var(--forest-2);background:#e3efe2}
+.options li.dim{opacity:.55}
+.answer{background:#e3efe2;border:3px solid var(--forest-2);border-radius:14px;padding:14px 18px;font-size:1.1em}
+.answer strong{font-family:var(--display);font-size:1.2em;color:var(--forest)}
+.wyr{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+@media (max-width:600px){.wyr{grid-template-columns:1fr}}
+.wyr div{border:3px solid var(--line);border-radius:16px;padding:18px;background:#fff;font-size:1.2em;font-weight:700;display:flex;align-items:center}
+.wyr .or{border:0;background:none;font-family:var(--display);font-weight:800;color:var(--ember);justify-content:center;font-size:1.3em}
+.rebus{align-self:center;border:3px dashed var(--bark);border-radius:16px;padding:18px 36px;text-align:center;font-family:var(--display);font-weight:800;font-size:clamp(32px,3vw,60px);line-height:1.25;color:var(--bark);background:#fff;letter-spacing:.08em}
+.rebus hr{border:0;border-top:4px solid var(--bark);margin:.15em 0}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.btn{min-height:68px;padding:.4em 1.1em;border-radius:14px;font-weight:700;font-size:1em;cursor:pointer;border:3px solid var(--forest);background:#fff;color:var(--forest)}
+.btn.primary{background:var(--ember);border-color:var(--ember);color:#fff}
+.btn.green{background:var(--forest);color:#fff}
+.btn.quiet{border-color:var(--line);color:var(--muted)}
+.fresh{font-size:.8em;color:var(--muted);font-style:italic}
+
+/* Welcome card */
+.welcome p{margin:0}
+.welcome ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;background:rgba(20,34,26,.55);z-index:20;display:flex;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dialog{background:var(--paper);border-radius:22px;border:3px solid var(--forest);max-width:980px;width:100%;max-height:100%;overflow:auto;padding:clamp(20px,3vw,40px);display:flex;flex-direction:column;gap:14px}
+.dialog h2{font-family:var(--display);color:var(--forest);margin:0;font-size:1.5em}
+.dialog h3{font-family:var(--display);color:var(--ember-dk);margin:.4em 0 0;font-size:1.1em}
+.dialog p,.dialog ul{margin:0}
+.dialog ul{padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+
+/* Woodland */
+.woods{position:fixed;left:0;right:0;bottom:0;height:130px;pointer-events:none;z-index:0}
+.woods svg{width:100%;height:100%;display:block}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--forest);color:#fff;padding:14px 22px;border-radius:14px;z-index:30;max-width:calc(100% - 32px);font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:fullscreen{background:var(--cream)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4C12 12 8 26 14 38c3 5 7 6 10 6s7-1 10-6c6-12 2-26-10-34z" fill="#3f7a55"/><path d="M24 8v36M24 20l-7-6M24 28l8-7M24 35l-6-5" stroke="#f3ecda" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      <h1><small>The Outdoor Practice</small>Wild Spin</h1>
+    </div>
+    <div class="modes" role="group" aria-label="Game mode">
+      <button id="m-free" data-mode="free">Free Play</button>
+      <button id="m-coop" data-mode="coop">Together</button>
+      <button id="m-team" data-mode="team">Two Teams</button>
+    </div>
+    <div class="tools">
+      <button class="tool" id="t-sound" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path id="t-sound-waves" d="M16 9c1.5 1.5 1.5 4.5 0 6M18.5 6.5c3 3 3 8 0 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span>Sound on</span></button>
+      <button class="tool" id="t-calm" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12c3-4 6-4 9 0s6 4 9 0" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><span>Calm motion</span></button>
+      <button class="tool" id="t-full"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><span>Full screen</span></button>
+      <button class="tool" id="t-help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5V14M12 17.5v.01" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg><span>How to play</span></button>
+      <button class="tool" id="t-reset"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><span>New session</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="left" aria-label="Spinning wheel">
+    <div class="wheel-wrap">
+      <svg viewBox="-120 -120 240 240" aria-hidden="false" role="img" aria-label="Category wheel">
+        <circle r="110" fill="#1a3a2a"/>
+        <circle r="106" fill="none" stroke="#b85420" stroke-width="2"/>
+        <g id="rotor"></g>
+        <g id="hub" role="button" tabindex="0" aria-label="Spin the wheel">
+          <circle r="27" fill="#fbf8ef" stroke="#1a3a2a" stroke-width="5"/>
+          <text y="5" text-anchor="middle" style="font-family:var(--display);font-weight:800;font-size:13px;fill:#1a3a2a;letter-spacing:1px">SPIN</text>
+        </g>
+        <polygon points="0,-84 -12,-114 12,-114" fill="#b85420" stroke="#fbf8ef" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <button class="spin-btn" id="spin">SPIN</button>
+    <div class="panel" id="panel"></div>
+  </section>
+
+  <section class="card" id="card" aria-live="polite"></section>
+</main>
+
+<div class="woods" aria-hidden="true"><svg id="woods" viewBox="0 0 1600 130" preserveAspectRatio="xMidYMax slice"></svg></div>
+
+<div class="overlay" id="help" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <h2 id="help-title">How to play</h2>
+    <p>Press <b>SPIN</b>. The wheel picks one of six categories and shows a challenge card. Read it out, enjoy it together, then spin again.</p>
+    <h3>Three ways to play</h3>
+    <ul>
+      <li><b>Free Play.</b> No scores and no clock. Just spin and chat.</li>
+      <li><b>Together.</b> Everyone is one big team. Each finished challenge adds a leaf to the pile.</li>
+      <li><b>Two Teams.</b> Split the room in two and rename the teams. Teams take turns. Use the + and − buttons to award points if you want them. Scoring is optional.</li>
+    </ul>
+    <h3>On each card</h3>
+    <ul>
+      <li><b>Reveal answer</b> shows the answer for quiz questions and teasers.</li>
+      <li><b>Another one</b> gives a new card from the same category.</li>
+      <li><b>Skip this one</b> puts the card back in the pile and shows a different one. Use it freely.</li>
+      <li><b>Spin again</b> picks a new category.</li>
+    </ul>
+    <h3>Facilitator notes</h3>
+    <ul>
+      <li>Animal Moves are made for standing and moving, with a sitting-down version on every card. Clear a little space first and check the floor is safe.</li>
+      <li>Anyone can pass on any card. Encourage quieter children without pushing them.</li>
+      <li>Cards do not repeat until every card in that category has been used.</li>
+      <li>Progress saves on this computer. Press <b>New session</b> to start fresh.</li>
+      <li><b>Calm motion</b> makes the wheel turn gently without fast spinning.</li>
+    </ul>
+    <button class="btn green" id="help-close" style="align-self:flex-start">Close</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+<div class="sr" id="sr" aria-live="assertive"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="outdoor-practice-wild-spin-kids-v1";
+
+var CATS=[
+ {key:"move",name:"Animal Moves",short:["Animal","Moves"],color:"#2e7a4c"},
+ {key:"trivia",name:"Nature Quiz",short:["Nature","Quiz"],color:"#c4561c"},
+ {key:"memory",name:"Explorer Stories",short:["Explorer","Stories"],color:"#7b3f74"},
+ {key:"wyr",name:"Would You Rather?",short:["Would You","Rather?"],color:"#2a6496"},
+ {key:"brain",name:"Riddles & Jokes",short:["Riddles","& Jokes"],color:"#8a6408"},
+ {key:"wild",name:"Wild Card",short:["Wild","Card"],color:"#1a3a2a"}
+];
+
+var DATA={
+move:[
+ {t:"Frog Jumps",d:["Crouch down low like a frog, hands on the floor.","Jump up high and shout “Ribbit!”","Land softly with bendy knees.","Do 5 frog jumps."],x:"Pat your knees, then shoot your arms up high and say “Ribbit!” 5 times."},
+ {t:"Bear Walk",d:["Put your hands and feet on the floor.","Walk slowly like a big heavy bear.","Give a friendly growl.","Walk 10 bear steps, then stand up tall."],x:"Walk your hands slowly along your legs like heavy bear paws, and growl."},
+ {t:"Flamingo Balance",d:["Stand tall and lift one foot off the floor.","Tuck your arms in like flamingo wings.","Count to 10 together.","Swap legs and count again."],x:"Lift one foot just off the floor and hold for 10. Then swap."},
+ {t:"Tree Grow",d:["Curl up small like a seed in the soil.","Slowly, slowly grow up into a tall tree.","Spread your branches wide.","Sway in the wind: gentle breeze, big storm, then still."],x:"Start curled over your knees, then grow up tall in your chair and sway."},
+ {t:"Owl Eyes",d:["Make big round owl eyes with your fingers.","Slowly turn your head to look left. Hoot!","Slowly turn to look right. Hoot!","Do it 5 times. What can your owl eyes spot?"],x:"This one works just the same sitting down."},
+ {t:"Kangaroo Hops",d:["Hold your hands up in front like little paws.","Hop forwards with both feet together.","Hop backwards to where you started.","Do 6 hops."],x:"Bounce in your seat and tap your feet together 6 times."},
+ {t:"Butterfly Wings",d:["Put your fingertips on your shoulders.","Bring your elbows together in front of you.","Open them wide like wings.","Flap 10 times, slow then fast then slow."],x:"This one works just the same sitting down."},
+ {t:"Hedgehog Curl",d:["Curl up into a tiny, tight hedgehog ball.","Hold still. Shh, a fox is near!","When the fox has gone, spring open into a big star.","Do it 3 times."],x:"Curl over your knees, then sit up and stretch into a star."},
+ {t:"Eagle Soar",d:["Stretch your arms out wide like wings.","Soar slowly around your own space.","Swoop down low, then glide up high.","Land and fold your wings."],x:"Spread your wings and lean gently left and right as you soar."},
+ {t:"Elephant Stomp",d:["Clasp your hands together and hang them down like a trunk.","Stomp slowly on the spot.","Swing your trunk side to side.","Lift your trunk and trumpet!"],x:"Stomp your feet on the floor and swing your trunk while sitting."},
+ {t:"Starfish Jumps",d:["Stand with your feet together and arms down.","Jump out into a big starfish shape.","Jump back in.","Do 8 starfish jumps."],x:"Open your arms and legs wide like a starfish, then close. 8 times."},
+ {t:"Woodpecker Toes",d:["Tap your toes on the floor as fast as a woodpecker.","Now slow and sleepy.","Now super fast again!","Stop and freeze."],x:"This one works just the same sitting down."},
+ {t:"Slow-Motion Sloth",d:["Sloths move very, very slowly.","Reach up and grab an imaginary branch in slow motion.","Now the other arm.","Can you yawn like a sloth in slow motion too?"],x:"This one works just the same sitting down."},
+ {t:"Rabbit Freeze",d:["Hop around your space like a rabbit.","When the leader shouts “Fox!”, freeze completely still.","When they shout “Carrot!”, hop again.","Play for about a minute."],x:"Bounce in your seat to hop, then freeze like a statue."},
+ {t:"Squirrel Gather",d:["Reach up high to pick a nut from the tree.","Bend down low to grab one from the ground.","Pop each one into your cheeks!","Gather 10 nuts."],x:"Reach up high, then down to your feet, while sitting."},
+ {t:"Duck Waddle",d:["Put your hands under your armpits for wings.","Waddle around your space.","Quack as you go.","Waddle back to your spot."],x:"Flap your wings and quack while you wiggle in your seat."},
+ {t:"Falling Leaf",d:["Stand tall like a leaf on a branch.","The wind blows. Float, twirl and drift slowly down.","Land gently on the ground.","Now float back up for another go."],x:"Let your hands be the leaves. Float them slowly down to your lap."},
+ {t:"Lion Breath",d:["Breathe in slowly through your nose.","Open your mouth wide and stick out your tongue.","Breathe out with a big lion ROAR!","Do 3 roars: a small one, a medium one and a huge one."],x:"This one works just the same sitting down."},
+ {t:"Spider Shake-Off",d:["Make your fingers into a little spider.","Let it creep from your toes up to your head.","Oh no! Shake it off your arms, legs and whole body!","Do it once more on the other side."],x:"Let the spider creep up your legs and arms, then shake it off."},
+ {t:"Heron Wade",d:["Herons wade through rivers on long legs.","Lift your knees high, step slowly and quietly.","Spot a fish? Peck down quickly with your beak!","Take 10 heron steps."],x:"Lift your knees one at a time, then peck with your hands."},
+ {t:"Snake Wiggle",d:["Put your hands together like a snake’s head.","Wiggle your whole body side to side.","Hissss as you go.","Wiggle down low, then up tall."],x:"Wiggle your arms and body in your seat and hiss."}
+],
+trivia:[
+ {q:"How many legs does a spider have?",o:["6","8","10","4"],a:1,f:"Spiders have 8 legs. Insects have 6."},
+ {q:"What does a caterpillar turn into?",o:["A beetle","A butterfly or moth","A worm","A bird"],a:1,f:"It makes a chrysalis or cocoon first, then comes out with wings."},
+ {q:"Which animal has spikes and snuffles about at night?",o:["Rabbit","Squirrel","Hedgehog","Mouse"],a:2,f:"A hedgehog has around 5,000 spikes."},
+ {q:"What do bees make?",o:["Jam","Honey","Milk","Bread"],a:1,f:"Bees also help flowers grow by carrying pollen from flower to flower."},
+ {q:"What is a baby frog called?",o:["Kitten","Tadpole","Chick","Calf"],a:1,f:"Tadpoles live in water and slowly grow legs."},
+ {q:"Which tree do acorns come from?",o:["Oak","Pine","Apple","Birch"],a:0,f:"A giant oak tree starts life as one little acorn."},
+ {q:"In which season do lots of leaves fall off trees?",o:["Spring","Summer","Autumn","Winter"],a:2,f:"In autumn, leaves turn red, orange and yellow before they fall."},
+ {q:"What colour is a robin’s chest?",o:["Blue","Red-orange","Green","Purple"],a:1,f:"Robins sing all through the winter."},
+ {q:"What do we call a badger’s home?",o:["A nest","A sett","A hive","A web"],a:1,f:"Badger setts have lots of tunnels and rooms underground."},
+ {q:"What do plants need to grow?",o:["Sunlight and water","Chocolate","Music","Darkness"],a:0,f:"They also need soil and air."},
+ {q:"Which bird can turn its head almost all the way round?",o:["Duck","Owl","Robin","Pigeon"],a:1,f:"Owls can’t move their eyes, so they turn their whole head instead."},
+ {q:"Where does a snail keep its home?",o:["In a tree","Under a rock","On its back","In a pond"],a:2,f:"A snail’s shell grows with it."},
+ {q:"Which one of these is a bird?",o:["Bat","Penguin","Butterfly","Squirrel"],a:1,f:"Penguins can’t fly, but they are birds. They have feathers and lay eggs."},
+ {q:"What is a baby fox called?",o:["A kit","A puppy","A foal","A lamb"],a:0,f:"Baby foxes are called kits or cubs."},
+ {q:"How many legs does an insect have?",o:["4","6","8","100"],a:1,f:"Ants, bees and ladybirds all have 6 legs."},
+ {q:"Which animal sleeps hanging upside down?",o:["Bat","Cat","Frog","Owl"],a:0,f:"Bats hang by their feet while they sleep."},
+ {q:"What falls from the clouds when it is very cold?",o:["Leaves","Snow","Sand","Feathers"],a:1,f:"Every snowflake has six sides."},
+ {q:"How do worms help the garden?",o:["They eat the flowers","They mix and air the soil","They scare birds","They make honey"],a:1,f:"Worms help plants grow healthy and strong."},
+ {q:"What makes a rainbow?",o:["Sunlight shining through raindrops","Paint in the sky","Wind","The moon"],a:0,f:"You see a rainbow when the sun is behind you and it’s raining in front of you."},
+ {q:"Which animal has a long sticky tongue to catch flies?",o:["Frog","Rabbit","Horse","Robin"],a:0,f:"A frog’s tongue flicks out super fast."},
+ {q:"What do squirrels bury in autumn?",o:["Bones","Nuts","Toys","Shells"],a:1,f:"Squirrels forget some of them, and those can grow into new trees!"}
+],
+memory:[
+ {q:"What’s the best thing you’ve ever found outside?",p:"A shell, a feather, a special stone, a bug? Where did you find it?"},
+ {q:"Tell us about a time you got REALLY muddy.",p:"Where were you, and what did the grown-ups say?"},
+ {q:"Have you ever built a den or climbed a tree?",p:"What was it like? Who helped you?"},
+ {q:"What’s your favourite thing to do at the park?",p:"Swings, running, feeding ducks, looking for bugs?"},
+ {q:"What animal have you seen outside that surprised you?",p:"Where was it, and what was it doing?"},
+ {q:"What’s your favourite weather, and why?",p:"Sunshine, rain, snow, wind, thunderstorms?"},
+ {q:"Tell us about a fun day at the beach or by a river.",p:"Did you paddle, build something, or find anything?"},
+ {q:"If you had a secret den in the woods, what would be in it?",p:"A snack store, a lookout, a pet beetle?"},
+ {q:"What’s your favourite sound outside?",p:"Birds, rain on a roof, crunchy leaves, the sea?"},
+ {q:"Have you ever grown something from a seed?",p:"A bean, a sunflower, cress? What happened?"},
+ {q:"What’s the coolest bug you’ve ever seen?",p:"What colour was it? How many legs?"},
+ {q:"Which wild animal would be your best friend?",p:"What would you do together all day?"},
+ {q:"Which season is your favourite?",p:"What do you love doing then?"},
+ {q:"Have you ever played in the snow?",p:"Snowman, snowball, sledging, snow angel?"},
+ {q:"If you were an explorer, where would you go?",p:"Jungle, mountains, under the sea, the North Pole?"},
+ {q:"What’s the tallest thing you’ve ever climbed?",p:"A hill, a tree, a climbing frame? How did it feel at the top?"},
+ {q:"What smell do you like outside?",p:"Cut grass, rain, flowers, a campfire, pine trees?"},
+ {q:"What’s your favourite fruit that grows on a tree or bush?",p:"Apples, cherries, blackberries, plums?"},
+ {q:"If you could ask an animal one question, what would you ask?",p:"Which animal would you pick?"},
+ {q:"Where is your favourite place outside?",p:"What makes it special?"},
+ {q:"Have you ever watched the stars or the moon?",p:"What did you see? What shapes did you spot?"}
+],
+wyr:[
+ {a:"Fly like a bird",b:"Swim like a fish"},
+ {a:"Live in a treehouse",b:"Live in an underground burrow"},
+ {a:"Have a tail",b:"Have wings"},
+ {a:"Be as small as an ant",b:"Be as tall as a giraffe"},
+ {a:"Splash in puddles",b:"Roll down a grassy hill"},
+ {a:"Talk to animals",b:"Talk to trees"},
+ {a:"Have a pet owl",b:"Have a pet fox"},
+ {a:"Always be a bit muddy",b:"Always be a bit wet"},
+ {a:"Be a busy bee",b:"Be a fluttery butterfly"},
+ {a:"Sleep in a tent in the woods",b:"Sleep in a hammock between two trees"},
+ {a:"Have eyes like an owl",b:"Have ears like a rabbit"},
+ {a:"Have a snow day every day",b:"Have a sunny day every day"},
+ {a:"Hop like a kangaroo",b:"Climb like a squirrel"},
+ {a:"Have a nose like an elephant",b:"Have a neck like a giraffe"},
+ {a:"Explore a jungle",b:"Explore the bottom of the sea"},
+ {a:"Find a dinosaur bone",b:"Find treasure on the beach"},
+ {a:"Be a tree for a day",b:"Be a cloud for a day"},
+ {a:"Have hair made of leaves",b:"Have a beard made of moss"},
+ {a:"Eat a (pretend) worm sandwich",b:"Drink a (pretend) slug smoothie"},
+ {a:"Be as fast as a cheetah",b:"Be as strong as an ant"},
+ {a:"Live where it’s always night",b:"Live where it’s always day"}
+],
+brain:[
+ {k:"Riddle",q:"I have a trunk, but I’m not an elephant. What am I?",ans:"A tree"},
+ {k:"Riddle",q:"What goes up when the rain comes down?",ans:"An umbrella"},
+ {k:"Riddle",q:"What has hands but can’t clap?",ans:"A clock"},
+ {k:"Riddle",q:"What has lots of rings but no fingers?",ans:"A tree! Count the rings in a tree trunk to find out how old it is."},
+ {k:"Riddle",q:"What can you catch but never throw?",ans:"A cold"},
+ {k:"Joke",q:"Why do birds fly south for the winter?",ans:"Because it’s too far to walk!"},
+ {k:"Joke",q:"What do you call a fish with no eyes?",ans:"A fsh!"},
+ {k:"Joke",q:"Why did the tree go to the dentist?",ans:"To get a root canal!"},
+ {k:"Joke",q:"What do you call a sleeping dinosaur?",ans:"A dino-snore!"},
+ {k:"Joke",q:"What’s a frog’s favourite drink?",ans:"Croak-a-cola!"},
+ {k:"Guess the animal",q:"I have a black and white stripy face, and I dig for worms at night. Who am I?",ans:"A badger"},
+ {k:"Guess the animal",q:"I have long ears and a fluffy white tail, and I love to hop. Who am I?",ans:"A rabbit"},
+ {k:"Guess the animal",q:"I have eight legs and I spin a sticky web. Who am I?",ans:"A spider"},
+ {k:"Odd one out",q:"Robin, blackbird, bat, sparrow. Which is the odd one out?",ans:"Bat. It’s a mammal. The others are birds."},
+ {k:"Odd one out",q:"Apple, pear, carrot, cherry. Which is the odd one out?",ans:"Carrot. It grows under the ground. The others grow on trees."},
+ {k:"Unscramble",q:"Unscramble these letters to make an animal: G R F O",ans:"FROG"},
+ {k:"Unscramble",q:"Unscramble these letters to find something on a tree: F A L E",ans:"LEAF"},
+ {k:"Unscramble",q:"Unscramble these letters to find a night bird: W L O",ans:"OWL"},
+ {k:"Maths puzzle",q:"A spider has 8 legs. How many legs do 2 spiders have?",ans:"16 legs"},
+ {k:"Trick question",q:"If a rooster lays an egg on a roof, which way does it roll?",ans:"It doesn’t! Roosters don’t lay eggs."},
+ {k:"What comes next?",q:"Leaf, acorn, leaf, acorn, leaf … what comes next?",ans:"Acorn"},
+ {k:"Rhyme time",q:"How many words can you think of that rhyme with TREE?",ans:"Bee, sea, knee, three, flea, tea, me …"},
+ {k:"Animal alphabet",q:"As a group, name an animal for every letter: A, B, C … How far can you get?",ans:""}
+],
+wild:[
+ {t:"Animal Charades",d:"Pick an animal and act it out with no words. Everyone else guesses."},
+ {t:"Freeze Frame",d:"The leader calls out an animal. Everyone becomes that animal. When the leader says “Freeze!”, hold your pose like a statue."},
+ {t:"Make a Rainstorm",d:"Together: rub your hands (wind), click your fingers (rain), pat your legs (heavy rain), stamp your feet (thunder!). Then go back down to a quiet breeze."},
+ {t:"Story Circle",d:"Go round the group, one sentence each. Start with: “Deep in the forest, a tiny hedgehog found a magic acorn …”"},
+ {t:"Bird Song Orchestra",d:"Split into owls, cuckoos and ducks. The leader is the conductor. Point to a group to start them singing, and raise your hands for LOUDER."},
+ {t:"Kind Words Chain",d:"Say something kind to the person next to you. Keep it going until it comes all the way round."},
+ {t:"Sound Detectives",d:"Everyone closes their eyes and stays super quiet for one minute. How many different sounds can you hear?"},
+ {t:"Invent an Animal",d:"Mix two animals together, like a frog and an owl: a frowl! What’s it called? What noise does it make? Show us how it moves."},
+ {t:"Be the Forest",d:"Everyone becomes a tree. The leader is the wind. Sway gently in the breeze, then wildly in the storm. Then everything goes still."},
+ {t:"Mirror Me",d:"Find a partner. One person moves slowly and the other copies, like a mirror. Then swap."},
+ {t:"Monster of the Woods",d:"Invent a friendly forest creature together. Each person adds one thing: horns, spots, ten legs, a silly voice."},
+ {t:"Animal Laughs",d:"Laughter time! Laugh like a donkey, then a hen, then a monkey, then a very posh owl."},
+ {t:"Simon Says, Nature Style",d:"Play Simon Says with nature moves: “Simon says flap like a bird.” “Simon says buzz like a bee.” “Wiggle like a worm!” Oops, Simon didn’t say!"},
+ {t:"Nature Thank-Yous",d:"Go round the group. Each person says one thing in nature they’re glad about. Passing is fine."},
+ {t:"Sleeping Lions",d:"Everyone lies or sits super still like sleeping lions. The leader tries to make them giggle without touching. If you move, you help the leader."},
+ {t:"Guess the Sound",d:"One person makes an animal noise. Everyone else guesses the animal. Then someone new has a go."},
+ {t:"Season Shout-Out",d:"The leader calls out a season. Everyone shouts things they love about it. Spring! Summer! Autumn! Winter!"},
+ {t:"Animal Superpowers",d:"If you could have one animal’s superpower, what would you choose? An owl’s night vision, a cheetah’s speed, a frog’s jump? Show us!"},
+ {t:"Shake It Out",d:"Shake your right hand 5 times, left hand 5, right foot 5, left foot 5. Then 4 each, then 3, 2, 1. Then a big WIGGLE!"},
+ {t:"Tiny Explorers",d:"Pick any object in the room and describe it as if you’re an explorer seeing it for the very first time. What do you think it’s for?"},
+ {t:"Weather Reporter",d:"One volunteer gives tomorrow’s weather forecast in a super-dramatic voice. Gusts! Drizzle! Showers of frogs?!"}
+]};
+
+var TOTAL=CATS.reduce(function(n,c){return n+DATA[c.key].length},0);
+
+/* ---------- state ---------- */
+var prm=false;try{prm=window.matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){}
+function defaults(){var u={};CATS.forEach(function(c){u[c.key]=[]});
+ return {mode:"free",used:u,scores:[0,0],names:["Foxes","Owls"],turn:0,together:0,played:0,muted:false,calm:prm,rotation:0,current:null,revealed:false,fresh:false}}
+var S=defaults();
+try{var saved=JSON.parse(localStorage.getItem(KEY)||"null");if(saved&&typeof saved==="object"){S=Object.assign(S,saved);CATS.forEach(function(c){if(!Array.isArray(S.used[c.key]))S.used[c.key]=[]})}}catch(e){}
+if(S.current&&(!DATA[S.current.cat]||!DATA[S.current.cat][S.current.id]))S.current=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+/* ---------- sound ---------- */
+var actx=null;
+function ac(){if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){actx=null}}
+ if(actx&&actx.state==="suspended"){try{actx.resume()}catch(e){}}return actx}
+function tone(f,dur,vol,type,when){if(S.muted)return;var a=ac();if(!a)return;var t=a.currentTime+(when||0);
+ var o=a.createOscillator(),g=a.createGain();o.type=type||"sine";o.frequency.value=f;
+ g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.015);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+ o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+dur+0.05)}
+function tick(){tone(900,0.05,0.04,"triangle")}
+function chime(){tone(523,1.0,0.10);tone(659,1.0,0.08,"sine",0.12);tone(784,1.3,0.07,"sine",0.24)}
+function soft(){tone(440,0.25,0.05)}
+
+/* ---------- wheel ---------- */
+function pt(a,r){var rad=a*Math.PI/180;return [(r*Math.sin(rad)).toFixed(2),(-r*Math.cos(rad)).toFixed(2)]}
+function buildWheel(){var h="";
+ CATS.forEach(function(c,i){var a0=i*60,a1=a0+60,p0=pt(a0,102),p1=pt(a1,102);
+  h+='<path d="M0 0 L'+p0[0]+' '+p0[1]+' A102 102 0 0 1 '+p1[0]+' '+p1[1]+' Z" fill="'+c.color+'" stroke="#f3ecda" stroke-width="2.5"/>';
+  h+='<g transform="rotate('+(a0+30)+')"><text class="seg-label" x="0" y="-70">'+c.short[0]+'</text><text class="seg-label" x="0" y="-56">'+c.short[1]+'</text>'+
+     '<path d="M0 -94c-4 3-5 7-3 10 1 1 2 2 3 2s2-1 3-2c2-3 1-7-3-10z" fill="#f3ecda" opacity=".8"/></g>';
+ });
+ CATS.forEach(function(c,i){var p=pt(i*60,102);h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3.4" fill="#f3ecda"/>'});
+ $("#rotor").innerHTML=h;setRot(S.rotation)}
+function setRot(r){$("#rotor").setAttribute("transform","rotate("+r.toFixed(2)+")")}
+
+var spinning=false;
+function spin(){
+ if(spinning)return;ac();
+ commit();
+ var idx=Math.floor(Math.random()*6);
+ var jitter=Math.random()*36-18;
+ var target=((360-(idx*60+30)+jitter)%360+360)%360;
+ var start=S.rotation,curMod=((start%360)+360)%360;
+ var delta=target-curMod;if(delta<0)delta+=360;
+ var turns=S.calm?0:4,end=start+turns*360+delta;
+ var dur=S.calm?900:4800;
+ spinning=true;$("#spin").disabled=true;$("#spin").textContent="Spinning…";
+ var lastSeg=Math.floor(start/30),t0=null;
+ function ease(t){return 1-Math.pow(1-t,S.calm?3:4)}
+ function frame(ts){if(t0===null)t0=ts;var t=Math.min(1,(ts-t0)/dur),r=start+(end-start)*ease(t);setRot(r);
+  var seg=Math.floor(r/30);if(seg!==lastSeg){lastSeg=seg;if(!S.calm)tick()}
+  if(t<1){requestAnimationFrame(frame)}else{S.rotation=end%360;setRot(S.rotation);spinning=false;
+   $("#spin").disabled=false;$("#spin").textContent="SPIN";chime();draw(CATS[idx].key);
+   $("#sr").textContent="The wheel landed on "+CATS[idx].name}}
+ requestAnimationFrame(frame);
+}
+
+/* ---------- challenges ---------- */
+function draw(cat,avoid){
+ var all=DATA[cat].map(function(_,i){return i}),used=S.used[cat];
+ var pool=all.filter(function(i){return used.indexOf(i)<0&&i!==avoid});var fresh=false;
+ if(!pool.length){S.used[cat]=[];pool=all.filter(function(i){return i!==avoid});fresh=true;if(!pool.length)pool=all}
+ var id=pool[Math.floor(Math.random()*pool.length)];
+ S.used[cat].push(id);S.current={cat:cat,id:id,done:false};S.revealed=false;S.fresh=fresh;
+ save();renderCard(true);renderPanel();
+}
+function commit(){if(!S.current||S.current.done)return;S.current.done=true;S.played++;
+ if(S.mode==="coop")S.together++;if(S.mode==="team")S.turn=1-S.turn;save()}
+function next(){var c=S.current.cat;commit();soft();draw(c)}
+function skip(){var c=S.current.cat,id=S.current.id;var u=S.used[c],k=u.indexOf(id);if(k>=0)u.splice(k,1);soft();draw(c,id)}
+function reveal(){S.revealed=true;save();chime();renderCard(false)}
+
+function catOf(k){for(var i=0;i<CATS.length;i++)if(CATS[i].key===k)return CATS[i]}
+
+function welcome(){
+ var m={free:"<b>Free Play.</b> No scores, no clock. Spin, chat and enjoy.",
+  coop:"<b>Together.</b> Everyone is one big team. Each challenge you finish adds a leaf to the pile.",
+  team:"<b>Two Teams.</b> Foxes and Owls take turns. Points are optional: use + and − under the wheel."}[S.mode];
+ return '<div class="card-head"><span class="chip">Ready when you are</span></div>'+
+  '<h2>Ready, explorers? Let’s spin!</h2>'+
+  '<div class="welcome" style="display:flex;flex-direction:column;gap:14px"><p>'+m+'</p>'+
+  '<ul><li>Six categories: animal moves, nature quiz, explorer stories, would you rather, riddles and jokes, and wild cards.</li>'+
+  '<li>Every move has a sitting-down version.</li><li>Have fun, be kind, and stay in your own space.</li></ul><p class="fresh">The Outdoor Practice · Holding space in nature</p></div>'+
+  '<div class="actions"><button class="btn primary" data-act="spin">Spin the wheel</button><button class="btn" data-act="help">How to play</button></div>';
+}
+
+function renderCard(anim){
+ var el=$("#card");
+ if(!S.current){el.innerHTML=welcome();return}
+ var c=catOf(S.current.cat),it=DATA[c.key][S.current.id],b="",hasAns=false;
+ if(c.key==="move"){
+  b='<h2>'+esc(it.t)+'</h2><ol class="steps">'+it.d.map(function(s){return '<li>'+esc(s)+'</li>'}).join("")+'</ol>'+
+    '<div class="note"><b>Sitting down?</b> '+esc(it.x)+'</div>'+
+    '<p class="safety">Stay in your own space. Sitting down is always fine.</p>';
+ }else if(c.key==="trivia"){
+  hasAns=true;var L=["A","B","C","D"];
+  b='<p class="lead">'+esc(it.q)+'</p><ul class="options">'+it.o.map(function(o,i){
+    var cls=S.revealed?(i===it.a?"right":"dim"):"";return '<li class="'+cls+'"><span class="k">'+L[i]+'</span><span>'+esc(o)+'</span></li>'}).join("")+'</ul>';
+  if(S.revealed)b+='<div class="answer"><strong>'+L[it.a]+': '+esc(it.o[it.a])+'</strong><br>'+esc(it.f)+'</div>';
+ }else if(c.key==="memory"){
+  b='<p class="lead">'+esc(it.q)+'</p><div class="note"><b>Think about:</b> '+esc(it.p)+'</div>'+
+    '<p class="safety">You can share, or pass. Both are fine.</p>';
+ }else if(c.key==="wyr"){
+  b='<h2>Would you rather …</h2><div class="wyr"><div>'+esc(it.a)+'</div><div class="or">or</div><div>'+esc(it.b)+'</div></div>'+
+    '<div class="note"><b>Hands up</b> for each one! Then ask someone from each side why they chose it.</div>';
+ }else if(c.key==="brain"){
+  hasAns=!!it.ans;
+  b='<p class="who" style="margin:0">'+esc(it.k)+'</p><p class="lead">'+esc(it.q)+'</p>';
+  if(it.r)b+='<div class="rebus">'+it.r.map(function(l){return l===""?'<hr>':'<div>'+esc(l)+'</div>'}).join(it.r[0]===""?"":'<hr>')+'</div>';
+  if(S.revealed&&hasAns)b+='<div class="answer"><strong>'+esc(it.ans)+'</strong></div>';
+ }else{
+  b='<h2>'+esc(it.t)+'</h2><p class="lead" style="font-weight:400">'+esc(it.d)+'</p>';
+ }
+ var who=S.mode==="team"?'<span class="who">Over to: '+esc(S.names[S.turn])+'</span>':"";
+ var acts="";
+ if(hasAns&&!S.revealed)acts+='<button class="btn primary" data-act="reveal">Reveal answer</button>';
+ acts+='<button class="btn '+(hasAns&&!S.revealed?"":"primary")+'" data-act="spin">Spin again</button>';
+ acts+='<button class="btn" data-act="next">Another one</button>';
+ acts+='<button class="btn quiet" data-act="skip">Skip this one</button>';
+ el.innerHTML='<div class="card-head"><span class="chip" style="--chip:'+c.color+'">'+esc(c.name)+'</span>'+who+'</div>'+b+
+  (S.fresh?'<p class="fresh">All '+esc(c.name)+' cards have been used, so that pile has been shuffled back in.</p>':"")+
+  '<div class="actions">'+acts+'</div>';
+ if(anim&&!S.calm){el.classList.remove("fade");void el.offsetWidth;el.classList.add("fade")}
+}
+
+var LEAF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6 6 4 13 7 19c1.5 2.5 3.5 3 5 3s3.5-.5 5-3c3-6 1-13-5-17z" fill="#3f7a55"/><path d="M12 5v17" stroke="#f3ecda" stroke-width="1.5"/></svg>';
+function renderPanel(){
+ var p=$("#panel"),usedN=0;CATS.forEach(function(c){usedN+=S.used[c.key].length});
+ var prog='<div class="progress">'+usedN+' of '+TOTAL+' cards seen this session</div><div class="bar" aria-hidden="true"><span style="width:'+Math.round(usedN/TOTAL*100)+'%"></span></div>';
+ if(S.mode==="free"){
+  p.innerHTML='<h2>Free Play</h2><p>No scores and no time limits. Just spin and have fun.</p>'+prog;
+ }else if(S.mode==="coop"){
+  var n=S.together,shown=Math.min(n,24),leaves="";for(var i=0;i<shown;i++)leaves+=LEAF;
+  p.innerHTML='<h2>Playing together</h2><div style="display:flex;align-items:baseline;gap:12px"><span class="big-num">'+n+'</span><span>leaves collected together</span></div>'+
+   '<div class="leaves">'+(leaves||'<span class="progress">Finish a challenge to gather your first leaf.</span>')+(n>24?'<span class="progress">+'+(n-24)+' more</span>':'')+'</div>'+prog;
+ }else{
+  var t=function(i){return '<div class="team'+(S.turn===i?' on':'')+'"><label class="sr" for="tn'+i+'">Team '+(i+1)+' name</label>'+
+   '<input id="tn'+i+'" data-team="'+i+'" value="'+esc(S.names[i])+'" maxlength="20">'+
+   '<div class="turn-tag">'+(S.turn===i?'Their turn':'&nbsp;')+'</div>'+
+   '<div class="score" aria-live="polite">'+S.scores[i]+'</div>'+
+   '<div class="row"><button data-minus="'+i+'" aria-label="Take a point from '+esc(S.names[i])+'">−</button><button class="plus" data-plus="'+i+'" aria-label="Give a point to '+esc(S.names[i])+'">+1</button></div></div>'};
+  p.innerHTML='<h2>Two Teams</h2><div class="teams">'+t(0)+t(1)+'</div><button class="link-btn" data-act="swap">Swap whose turn it is</button>'+prog;
+ }
+}
+
+function renderTools(){
+ ["free","coop","team"].forEach(function(m){$("#m-"+m).setAttribute("aria-pressed",S.mode===m?"true":"false")});
+ var s=$("#t-sound");s.setAttribute("aria-pressed",S.muted?"false":"true");s.querySelector("span").textContent=S.muted?"Sound off":"Sound on";
+ $("#t-sound-waves").style.display=S.muted?"none":"";
+ $("#t-calm").setAttribute("aria-pressed",S.calm?"true":"false");
+}
+
+/* ---------- toast ---------- */
+var tt=null;function toast(m){var t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},4500)}
+
+/* ---------- events ---------- */
+$("#spin").addEventListener("click",spin);
+$("#hub").addEventListener("click",spin);
+$("#hub").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();spin()}});
+$("#card").addEventListener("click",function(e){var b=e.target.closest("[data-act]");if(!b)return;var a=b.getAttribute("data-act");
+ if(a==="spin")spin();else if(a==="next")next();else if(a==="skip")skip();else if(a==="reveal")reveal();else if(a==="help")openHelp()});
+document.querySelectorAll(".modes button").forEach(function(b){b.addEventListener("click",function(){S.mode=b.getAttribute("data-mode");save();renderTools();renderPanel();renderCard(false)})});
+$("#panel").addEventListener("click",function(e){var t=e.target;
+ if(t.hasAttribute("data-plus")){var i=+t.getAttribute("data-plus");S.scores[i]++;soft();save();renderPanel()}
+ else if(t.hasAttribute("data-minus")){var j=+t.getAttribute("data-minus");S.scores[j]=Math.max(0,S.scores[j]-1);save();renderPanel()}
+ else if(t.getAttribute("data-act")==="swap"){S.turn=1-S.turn;save();renderPanel();renderCard(false)}});
+$("#panel").addEventListener("input",function(e){var t=e.target;if(t.hasAttribute("data-team")){S.names[+t.getAttribute("data-team")]=t.value||("Team "+(+t.getAttribute("data-team")+1));save();renderCard(false)}});
+$("#panel").addEventListener("change",function(){renderPanel()});
+$("#t-sound").addEventListener("click",function(){S.muted=!S.muted;save();renderTools();if(!S.muted){ac();soft()}});
+$("#t-calm").addEventListener("click",function(){S.calm=!S.calm;save();renderTools();toast(S.calm?"Calm motion on. The wheel will turn gently.":"Calm motion off. The wheel will spin fully.")});
+$("#t-full").addEventListener("click",function(){var d=document,el=d.documentElement;
+ try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
+  var req=el.requestFullscreen||el.webkitRequestFullscreen;if(!req)throw 0;var r=req.call(el);if(r&&r.catch)r.catch(function(){fsFail()})}catch(e){fsFail()}});
+function fsFail(){toast("Full screen isn’t available here. In your browser, press Control + Command + F on a Mac.")}
+var resetArm=null;
+$("#t-reset").addEventListener("click",function(){var b=$("#t-reset");
+ if(!resetArm){b.classList.add("warn");b.querySelector("span").textContent="Tap again to reset";resetArm=setTimeout(disarm,4000);return}
+ disarm();var keep={muted:S.muted,calm:S.calm,mode:S.mode,names:S.names};S=Object.assign(defaults(),keep);save();setRot(0);renderAll();toast("New session started. All cards are back in the pile.")});
+function disarm(){clearTimeout(resetArm);resetArm=null;var b=$("#t-reset");b.classList.remove("warn");b.querySelector("span").textContent="New session"}
+function openHelp(){$("#help").hidden=false;$("#help-close").focus()}
+$("#t-help").addEventListener("click",openHelp);
+$("#help-close").addEventListener("click",function(){$("#help").hidden=true;$("#t-help").focus()});
+$("#help").addEventListener("click",function(e){if(e.target.id==="help")$("#help").hidden=true});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")$("#help").hidden=true});
+
+/* ---------- woodland ---------- */
+function woods(){var seed=7;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280}
+ var h='',x;
+ h+='<path d="M560 34q8-8 16 0q8-8 16 0" stroke="#1a3a2a" stroke-width="2.5" fill="none" opacity=".35"/><path d="M610 22q6-6 12 0q6-6 12 0" stroke="#1a3a2a" stroke-width="2" fill="none" opacity=".3"/>';
+ h+='<path d="M1180 40q7-7 14 0q7-7 14 0" stroke="#1a3a2a" stroke-width="2.5" fill="none" opacity=".3"/>';
+ for(var layer=0;layer<2;layer++){var op=layer?0.22:0.12,base=130;x=-20+layer*30;
+  while(x<1640){var w=40+rnd()*50,ht=(layer?55:80)+rnd()*40;
+   if(rnd()<0.55){h+='<polygon points="'+x+','+base+' '+(x+w/2)+','+(base-ht)+' '+(x+w)+','+base+'" fill="#1a3a2a" opacity="'+op+'"/>'}
+   else{var cx=x+w/2,r=w/2;h+='<rect x="'+(cx-3)+'" y="'+(base-ht*0.5)+'" width="6" height="'+(ht*0.5)+'" fill="#5a4630" opacity="'+op+'"/><circle cx="'+cx+'" cy="'+(base-ht*0.6)+'" r="'+r+'" fill="#2a5540" opacity="'+op+'"/>'}
+   x+=w*(0.6+rnd()*0.6)}}
+ h+='<rect x="0" y="122" width="1600" height="8" fill="#1a3a2a" opacity=".25"/>';
+ $("#woods").innerHTML=h}
+
+function renderAll(){renderTools();renderPanel();renderCard(false)}
+buildWheel();woods();renderAll();
+})();
+</script>
+</body>
+</html>
