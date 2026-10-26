@@ -30,7 +30,11 @@ button,input{font:inherit;color:inherit}
 .top-inner{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding-block:14px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}
-.brand svg{width:44px;height:44px;flex:none}
+.brand svg{width:56px;height:56px;flex:none}
+.lockup{display:flex;align-items:center;gap:14px;padding-top:14px;border-top:2px solid var(--line)}
+.lockup svg{width:64px;height:64px;flex:none}
+.lockup b{display:block;font-family:Georgia,'DejaVu Serif','Times New Roman',serif;font-weight:700;font-size:1.15em;color:#1b2e1c;line-height:1.1}
+.lockup span{display:block;font-size:.62em;letter-spacing:.12em;text-transform:uppercase;color:#5f7a54;margin-top:4px}
 .brand h1{font-family:var(--display);font-weight:800;font-size:1.5em;line-height:1.05;margin:0;text-wrap:balance}
 .brand h1 small{display:block;font-family:var(--body);font-weight:700;font-size:.5em;letter-spacing:.14em;text-transform:uppercase;color:#e9b48f}
 .modes{display:flex;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);border-radius:16px;padding:4px;gap:4px;flex-wrap:wrap}
@@ -143,7 +147,7 @@ button,input{font:inherit;color:inherit}
 <header class="top">
   <div class="top-inner">
     <div class="brand">
-      <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4C12 12 8 26 14 38c3 5 7 6 10 6s7-1 10-6c6-12 2-26-10-34z" fill="#3f7a55"/><path d="M24 8v36M24 20l-7-6M24 28l8-7M24 35l-6-5" stroke="#f3ecda" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 100 100" role="img" aria-label="The Outdoor Practice logo"><circle cx="50" cy="50" r="46" fill="none" stroke="#8db27a" stroke-width="2.6"/><g stroke="#f3ecda"><path d="M50 11.5V88.5M32.1 47.2L50 29.3L67.9 47.2M36 58.8L50 44.8L64 58.8" fill="none" stroke-width="2.6"/></g></svg>
       <h1><small>The Outdoor Practice</small>Wild Spin</h1>
     </div>
     <div class="modes" role="group" aria-label="Game mode">
@@ -457,7 +461,7 @@ function welcome(){
   '<h2>Ready, explorers? Let’s spin!</h2>'+
   '<div class="welcome" style="display:flex;flex-direction:column;gap:14px"><p>'+m+'</p>'+
   '<ul><li>Six categories: animal moves, nature quiz, explorer stories, would you rather, riddles and jokes, and wild cards.</li>'+
-  '<li>Every move has a sitting-down version.</li><li>Have fun, be kind, and stay in your own space.</li></ul><p class="fresh">The Outdoor Practice · Holding space in nature</p></div>'+
+  '<li>Every move has a sitting-down version.</li><li>Have fun, be kind, and stay in your own space.</li></ul></div><div class="lockup"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#4f6b43" stroke-width="1.8"/><g stroke="#1b2e1c"><path d="M50 11.5V88.5M32.1 47.2L50 29.3L67.9 47.2M36 58.8L50 44.8L64 58.8" fill="none" stroke-width="1.6"/></g></svg><div><b>The Outdoor Practice</b><span>Holding space for the space holders</span></div></div>'+
   '<div class="actions"><button class="btn primary" data-act="spin">Spin the wheel</button><button class="btn" data-act="help">How to play</button></div>';
 }
 
